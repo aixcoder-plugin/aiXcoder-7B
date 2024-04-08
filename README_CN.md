@@ -38,13 +38,13 @@ aiXcoder 7B Base 在代码补全场景下是所有同等级参数量模型中效
 然而，我们已经在规划中包含了对aiXcoder模型系列的进一步发展。在不久的将来，我们计划发布新的模型版本，这些版本将经过精心的Instruct微调，专门针对更广泛的编程任务，包括但不限于测试用例生成和代码调试。通过这些经过Instruct微调的模型，我们期待能够为开发者提供更全面、更深入的编程支持，帮助他们在软件开发的每一个阶段都能发挥出最大的效率。
 
 ![table_1](./assets/table_1.png)
-> aiXcoder 7B surpasses mainstream models in nl2code benchmark.
+> aiXcoder 7B surpasses mainstream models in nl2code benchmark. aiXcoder-7B is an enhancement of aiXcoder-7B-Base, fine-tuned on one hundred thousand data entries similar to Evol-instruct for one epoch.
 
 <br>
 <br>
 
 ![table_3](./assets/table_3.png)
-> aiXcoder 7B surpasses mainstream models in nl2code benchmark. aiXcoder-7B is an enhancement of aiXcoder-7B-Base, fine-tuned on one hundred thousand data entries similar to Evol-instruct for one epoch.
+> aiXcoder 7B Base surpasses mainstream models in code completion scenarios. 
 
 <br>
 <br>
