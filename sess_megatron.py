@@ -253,6 +253,9 @@ class TestInference:
             code_string=code_string, later_code=later_code, file_path=file_path
         )
 
+        if len(tokens) == 0:
+            return self.sess.sync_obj_info("")
+
         predict_list = []
         common_len = 0
         while True:

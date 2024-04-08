@@ -1,11 +1,12 @@
 import torch
+import sys
 from hf_mini.utils import input_wrapper
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 device = "cuda" # the device to load the model onto
 
-tokenizer = AutoTokenizer.from_pretrained("/data2/aix3_base_7b/aiXcoder-7b")
-model = AutoModelForCausalLM.from_pretrained("/data2/aix3_base_7b/aiXcoder-7b", torch_dtype=torch.bfloat16)
+tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aiXcoder-7b")
+model = AutoModelForCausalLM.from_pretrained("aiXcoder/aiXcoder-7b", torch_dtype=torch.bfloat16)
 
 
 text = input_wrapper(
@@ -14,6 +15,8 @@ text = input_wrapper(
     path="test.py"
 )
 
+if len(text) == 0:
+    sys.exit()
 
 inputs = tokenizer(text, return_tensors="pt", return_token_type_ids=False)
 

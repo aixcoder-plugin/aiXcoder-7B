@@ -8,7 +8,7 @@ import time
 import datetime
 import torch
 from megatron_mini.model.module import ModelType
-
+from megatron_mini.filter import SensitiveInforRM
 
 
 from megatron_mini import (
@@ -1210,6 +1210,7 @@ class Tokenizer:
             self.bos_id, self.eos_id, self.pad_id, self.eot_id,
             self.prefix_id, self.middle_id, self.suffix_id
         }
+        self.is_security = SensitiveInforRM()
 
         if rank == 0 and logger_info:
             print(
@@ -1240,6 +1241,18 @@ class Tokenizer:
             return self.sp_model.encode(p + s)
     
     def encode(self, code_string: str, later_code: str, file_path: str) -> List[int]:
+
+        start = time.time()
+        _sequerity = True
+        for i in [code_string, later_code, file_path]:
+            if not self.is_security.is_security(i):
+                _sequerity = False
+                break
+        print(f"Done inputs checking with {(time.time()-start) * 1000:.2f}ms", flush=True)
+
+        if not _sequerity:
+            return []
+    
         assert len(code_string) > 0
         if len(later_code) == 0:
             t = self.__encode(code_string, file_path, False)

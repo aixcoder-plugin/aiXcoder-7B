@@ -1,5 +1,9 @@
 # aiXcoder-7B Code Large Language Model
 
+<p align="center">
+    🏠 <a href="https://www.aixcoder.com/" target="_blank">Official website</a>｜🛠 <a href="https://marketplace.visualstudio.com/items?itemName=aixcoder-plugin.aixcoder" target="_blank">VS Code Plugin</a>｜🛠 <a href="https://plugins.jetbrains.com/plugin/13574-aixcoder-code-completer" target="_blank">Jetbrains Plugin</a>｜🤗 <a href="https://huggingface.co/aiXcoder/aiXcoder-7b" target="_blank">Model Weights</a>｜<a href="" target="_blank">WeChat</a>｜<a href="./assets/wechat_2.jpg" target="_blank">WeChat Official Account</a>
+</p>
+
 Welcome to the official repository of aiXcoder-7B Code Large Language Model. This model is designed to understand and generate code across multiple programming languages, offering state-of-the-art performance in code completion, comprehension, generation, and more tasks about programming languages.
 
 Table of Contents
@@ -34,13 +38,13 @@ In our ongoing exploration to apply large code models, the release of aiXcoder 7
 However, we have plans for further development of the aiXcoder model series already in motion. In the near future, we aim to release new versions of the model that have been meticulously instruct-tuned for a wider range of programming tasks, including but not limited to test case generation and code debugging. Through these instruct-tuned models, we anticipate offering developers more comprehensive and deeper programming support, helping them to maximize efficiency at every stage of software development.
 
 ![table_1](./assets/table_1.png)
-> aiXcoder 7B surpasses mainstream models in nl2code benchmark.
+> aiXcoder 7B surpasses mainstream models in nl2code benchmark. aiXcoder-7B is an enhancement of aiXcoder-7B-Base, fine-tuned on one hundred thousand data entries similar to Evol-instruct for one epoch.
 
 <br>
 <br>
 
 ![table_3](./assets/table_3.png)
-> aiXcoder 7B surpasses mainstream models in code completion scenarios.
+> aiXcoder 7B Base surpasses mainstream models in code completion scenarios.
 
 <br>
 <br>
@@ -61,6 +65,8 @@ To run the model inference code, you'll need the following environment setup:
 Please ensure all dependencies are installed using the following command:
 
 ```bash
+conda create -n aixcoder-7b python=3.11
+conda activate aixcoder-7b
 git clone git@github.com:aixcoder-plugin/aiXcoder-7b.git
 cd aiXcoder-7b
 pip install -r requirements.txt
@@ -180,9 +186,11 @@ print(quick_sort(arr))  # [1, 2, 3, 4, 5]
 
 ```python
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
 
+import torch
+import sys
+from hf_mini.utils import input_wrapper
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 device = "cuda" # the device to load the model onto
 
@@ -190,20 +198,24 @@ tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aiXcoder-7b")
 model = AutoModelForCausalLM.from_pretrained("aiXcoder/aiXcoder-7b", torch_dtype=torch.bfloat16)
 
 
-text = """▁<AIX-SPAN-PRE>▁<AIX-SPAN-POST>
-# 测试
-arr = [3, 2, 1, 4, 5]
-print(quick_sort(arr))  # [1, 2, 3, 4, 5]▁<AIX-SPAN-MIDDLE># the file path is: test.py
-# the code file is written by Python
-# 快速排序算法"""
+text = input_wrapper(
+    # for FIM style input, code_string stands for prefix context
+    code_string="# 快速排序算法",
+    # for FIM style input, later_code stands for suffix context
+    later_code="\n# 测试\narr = [3, 2, 1, 4, 5]\nprint(quick_sort(arr))  # [1, 2, 3, 4, 5]",
+    # file_path should be a path from project to file
+    path="test.py"
+)
 
+if len(text) == 0:
+    sys.exit()
 
 inputs = tokenizer(text, return_tensors="pt", return_token_type_ids=False)
 
 inputs = inputs.to(device)
 model.to(device)
 
-outputs = model.generate(**inputs, max_new_tokens=512)
+outputs = model.generate(**inputs, max_new_tokens=256)
 print(tokenizer.decode(outputs[0], skip_special_tokens=False))
 
 
@@ -240,7 +252,7 @@ def quick_sort(arr):
 
 ## Data for aiXcoder 7B
 
-The core dataset for aiXcoder 7B comprises the programming languages commonly used in development, as well as natural languages closely related to code. The core dataset's programming languages mainly include nearly a hundred mainstream languages such as C++, Python, Java, and JavaScript, while the natural language component primarily consists of StackOverflow Q&As, technical blogs, code documentation, and computer science papers. 
+The data for aiXcoder is divided into a core dataset and an extended dataset. The core dataset comprises the programming languages commonly used in development, as well as natural languages closely related to code. The core dataset's programming languages mainly include nearly a hundred mainstream languages such as C++, Python, Java, and JavaScript, while the natural language component primarily consists of StackOverflow Q&As, technical blogs, code documentation, and computer science papers. The extended data mainly consists of filtered open-source code datasets, high-quality English natural language datasets, and high-quality Chinese natural language datasets.
 
 <!-- <br>
 <br>
@@ -327,7 +339,7 @@ Currently, the mainstream evaluation dataset for context-aware code completion i
 
 To further evaluate the code completion capabilities of large language models for code in a more fine-grained manner, aiXcoder has built an evaluation dataset that is larger in size, more diverse in the code being tested, longer in the context length of the code being tested, and closer to real-world development projects. This evaluation dataset will also be open-sourced on GitHub simultaneously. During the evaluation process, we ensure that different large language models for code use the same maximum sequence length of 16K and evaluate the generation performance in different scenarios, such as generating complete method blocks, conditional blocks, loop processing blocks, exception handling blocks, and a total of thirteen cases.
 
-Table 3 shows the average generation performance of different models in different languages. The final evaluation results are the average of all completion scenarios and evaluation samples. The aiXcoder 7B model achieves the best performance across major programming languages and various evaluation criteria, indicating that aiXcoder 7B has the best basic code completion capability among all open-source models of the same scale and is the most suitable base model for providing code completion capabilities in real-world programming scenarios.
+Table 3 shows the average generation performance of different models in different languages. The final evaluation results are the average of all completion scenarios and evaluation samples. The aiXcoder 7B Base model achieves the best performance across major programming languages and various evaluation criteria, indicating that aiXcoder 7B Base has the best basic code completion capability among all open-source models of the same scale and is the most suitable base model for providing code completion capabilities in real-world programming scenarios.
 
 ![table_3](./assets/table_3.png)
 
@@ -362,7 +374,8 @@ In Table 8, we first evaluate the generation capability of each large language m
 ## License
 
 
-This project is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) License - see the LICENSE file for details. The model weights are licensed under the Model License.
+The source code in this repository is licensed under the [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) License - see the LICENSE file for details. 
+The model weights are licensed under the [Model License](./MODEL_LICENSE) for academic research use; for commercial use, please apply by sending an email to support@aiXcoder.com.
 
 
 ## Acknowledgments

@@ -1090,7 +1090,20 @@ LANGUAGE_TAG = {
 
 
 import re
-def input_wrapper(code_string, later_code: str = "", path: str = ""):
+from hf_mini.filter import SensitiveInforRM
+is_security = SensitiveInforRM()
+
+def input_wrapper(code_string, later_code: str = "", path: str = "") -> str:
+
+    _sequerity = True
+    for i in [code_string, later_code, path]:
+        if not is_security.is_security(i):
+            _sequerity = False
+            break
+    
+    if not _sequerity:
+        return ""
+
     extension_pattern = re.compile(r"(\.\w+)$")
     p = ""
     if isinstance(path, str) and len(path) > 0:
