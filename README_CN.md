@@ -131,7 +131,13 @@ MAX_JOBS=8 python setup.py install
 torchrun --nproc_per_node 1 sess_megatron.py --model-dir "path/to/model_weights_dir"
 ```
 
-将 "path/to/model_weights_dir"替换为您下载模型权重后的本地地址。
+将 "path/to/model_weights_dir" 替换为您下载模型权重后的本地地址。
+
+或者通过 huggingface 的 transformers 库进行推理测试：
+
+```bash
+python sess_huggingface.py
+```
 
 #### Python 脚本
 
@@ -302,7 +308,7 @@ class MyClass(object):
 
 训练配置:
 - 70% 为结构化 FIM (Fill in the middle)训练任务，30% 为自回归语言模型任务；
-- BFlot 16 数据类型
+- BFloat 16 数据类型
 - AdamW 优化器，学习率最大1e-5，最小 1e-6，采用余弦衰减
 - 预训练长度为 32,768
 
