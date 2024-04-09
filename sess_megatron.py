@@ -31,7 +31,7 @@ def add_code_generation_args(parser):
         help="Start id for whitespace encoding",
     )
     group.add_argument("--model_dir", type=str, default="")
-    group.add_argument("--model_name", type=str, default="aix3-7b")
+    group.add_argument("--model_name", type=str, default="aix3-7b-base")
 
     return parser
 

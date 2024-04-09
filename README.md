@@ -1,7 +1,7 @@
 # aiXcoder-7B Code Large Language Model
 
 <p align="center">
-    🏠 <a href="https://www.aixcoder.com/" target="_blank">Official website</a>｜🛠 <a href="https://marketplace.visualstudio.com/items?itemName=aixcoder-plugin.aixcoder" target="_blank">VS Code Plugin</a>｜🛠 <a href="https://plugins.jetbrains.com/plugin/13574-aixcoder-code-completer" target="_blank">Jetbrains Plugin</a>｜🤗 <a href="https://huggingface.co/aiXcoder/aiXcoder-7b" target="_blank">Model Weights</a>｜<a href="" target="_blank">WeChat</a>｜<a href="./assets/wechat_2.jpg" target="_blank">WeChat Official Account</a>
+    🏠 <a href="https://www.aixcoder.com/" target="_blank">Official website</a>｜🛠 <a href="https://marketplace.visualstudio.com/items?itemName=aixcoder-plugin.aixcoder" target="_blank">VS Code Plugin</a>｜🛠 <a href="https://plugins.jetbrains.com/plugin/13574-aixcoder-code-completer" target="_blank">Jetbrains Plugin</a>｜🤗 <a href="https://huggingface.co/aiXcoder/aixcoder-7b-base" target="_blank">Model Weights</a>｜<a href="./assets/wechat_1.jpg" target="_blank">WeChat</a>｜<a href="./assets/wechat_2.jpg" target="_blank">WeChat Official Account</a>
 </p>
 
 Welcome to the official repository of aiXcoder-7B Code Large Language Model. This model is designed to understand and generate code across multiple programming languages, offering state-of-the-art performance in code completion, comprehension, generation, and more tasks about programming languages.
@@ -123,7 +123,7 @@ Using Docker provides a clean, controlled environment that minimizes issues rela
 
 You can download the model weights from the following link: 
 
-- [aiXcoder Base Download](https://huggingface.co/aiXcoder/aiXcoder-7b)
+- [aiXcoder Base Download](https://huggingface.co/aiXcoder/aixcoder-7b-base)
 - aiXcoder Instruct Download (Comming soon...)
 
 ### Inference Example
@@ -194,8 +194,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 device = "cuda" # the device to load the model onto
 
-tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aiXcoder-7b")
-model = AutoModelForCausalLM.from_pretrained("aiXcoder/aiXcoder-7b", torch_dtype=torch.bfloat16)
+tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aixcoder-7b-base")
+model = AutoModelForCausalLM.from_pretrained("aiXcoder/aixcoder-7b-base", torch_dtype=torch.bfloat16)
 
 
 text = input_wrapper(

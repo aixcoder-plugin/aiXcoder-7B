@@ -1,7 +1,7 @@
 # aiXcoder-7B Code Large Language Model
 
 <p align="center">
-    🏠 <a href="https://www.aixcoder.com/" target="_blank">官网</a>｜🛠 <a href="https://marketplace.visualstudio.com/items?itemName=aixcoder-plugin.aixcoder" target="_blank">VS Code 插件</a>｜🛠 <a href="https://plugins.jetbrains.com/plugin/13574-aixcoder-code-completer" target="_blank">Jetbrains 插件</a>｜🤗 <a href="https://huggingface.co/aiXcoder/aiXcoder-7b" target="_blank">模型下载</a>｜<a href="" target="_blank">技术交流群</a>｜<a href="./assets/wechat_2.jpg" target="_blank">公众号</a>
+    🏠 <a href="https://www.aixcoder.com/" target="_blank">官网</a>｜🛠 <a href="https://marketplace.visualstudio.com/items?itemName=aixcoder-plugin.aixcoder" target="_blank">VS Code 插件</a>｜🛠 <a href="https://plugins.jetbrains.com/plugin/13574-aixcoder-code-completer" target="_blank">Jetbrains 插件</a>｜🤗 <a href="https://huggingface.co/aiXcoder/aixcoder-7b-base" target="_blank">模型下载</a>｜<a href="./assets/wechat_1.jpg" target="_blank">技术交流群</a>｜<a href="./assets/wechat_2.jpg" target="_blank">公众号</a>
 </p>
 
 欢迎来到aiXcoder-7B代码大型语言模型的官方仓库。该模型旨在理解和生成多种编程语言中的代码，提供在代码完成、理解、生成以及更多关于编程语言的任务中的最先进性能。
@@ -118,7 +118,7 @@ MAX_JOBS=8 python setup.py install
 
 您能从以下地址下载模型：
 
-- [aiXcoder Base Download](https://huggingface.co/aiXcoder/aiXcoder-7b)
+- [aiXcoder Base Download](https://huggingface.co/aiXcoder/aixcoder-7b-base)
 - aiXcoder Instruct Download (Comming soon...)
 
 ### 推理示例
@@ -182,8 +182,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 device = "cuda" # the device to load the model onto
 
-tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aiXcoder-7b")
-model = AutoModelForCausalLM.from_pretrained("aiXcoder/aiXcoder-7b", torch_dtype=torch.bfloat16)
+tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aixcoder-7b-base")
+model = AutoModelForCausalLM.from_pretrained("aiXcoder/aixcoder-7b-base", torch_dtype=torch.bfloat16)
 
 
 text = input_wrapper(

@@ -5,8 +5,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 device = "cuda" # the device to load the model onto
 
-tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aiXcoder-7b")
-model = AutoModelForCausalLM.from_pretrained("aiXcoder/aiXcoder-7b", torch_dtype=torch.bfloat16)
+tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aixcoder-7b-base")
+model = AutoModelForCausalLM.from_pretrained("aiXcoder/aixcoder-7b-base", torch_dtype=torch.bfloat16)
 
 
 text = input_wrapper(
