@@ -16,8 +16,8 @@ Table of Contents
 3. [Data for aiXcoder 7B](#data-for-aixcoder-7b)
 4. [Training](#training)
     - [Training Hyperparameters](#training-hyperparameters)
-    <!-- - [Batch processing method](#batch-processing-method)
-    - [Pre-training Tasks](#pre-training-tasks) -->
+    - [Batch processing method](#batch-processing-method)
+    - [Pre-training Tasks](#pre-training-tasks)
 5. [Details of Experimental Results](#details-of-experimental-results)
     - [NL2Code Benchmarks](#nl2code-benchmarks)
     - [Code Completion (Fill in the Middle)](#code-completion-fill-in-the-middle)
@@ -318,6 +318,38 @@ Training Parameters:
 - Pretraining sequence length of 32,768
 
 
+### Batch processing method
+
+After preprocessing, our code data is organized by project, with the order of files within a project considering both rules and randomness. Specifically, we attempt to cluster similar or dependent code files together using methods like Calling Graph, K-Means clustering, file path similarity, and TF-IDF distance, to help the model better understand the relationships between code files. However, the ordering of code files also incorporates randomness, since in real programming scenarios, projects are not complete, and code files with similarities or dependencies may not be fully developed yet.
+
+By ensuring that the project code files overall exhibit randomness while locally having similar or dependent relationships, we stretch the project code files into a vector and organize the sequence of batches using the Transformer-XL style processing. Even though the sequence length of a single batch has already reached 32,768 during the pre-training process, this method still allows for the extension of the visible sequence length to be even longer.
+
+### Pre-training Tasks
+
+Unlike other natural language large models or code models, in the context of code programming, aiXcoder considers the structural characteristics of code itself, aiming to have the model predict complete code nodes. In simple terms, the aiXcoder 7b training tasks combine the fill in the middle (FIM, Bavarian et al., 2022) and parser generator tool techniques. When constructing training data, we parse the code into an abstract syntax tree (AST) and randomly select a complete node to construct a FIM task. The rationale behind this approach is twofold: first, we need to ensure that the input data is relatively complete, with both the preceding and subsequent parts being at the same hierarchical level. Secondly, we also want the model's predictions to be more complete, with the generated code having a full hierarchical structure.
+
+```python
+for i in range(20):
+    if i % 5 == 0:
+        print("Hello World")
+```
+
+![table_0](./assets/graphviz.svg)
+> Given that simple code can be parsed into an abstract syntax tree (AST), we will construct structured Fill In the Middle (FIM) training tasks based on the nodes of the AST.
+
+<br>
+<br>
+
+Suppose we select the IF node in the above AST, then we will construct training samples from the IF node and its subtree. The following two examples are equivalent:
+
+```bash
+
+# fill in the middle, SPM mode
+"<s>▁<AIX-SPAN-PRE>▁<AIX-SPAN-POST>        print(\"Hello World\")\n▁<AIX-SPAN-MIDDLE># the file path is: test.py\n# the code file is written by Python\nfor i in range(20):\n    if i % 5 == 0:<\s>"
+
+# fill in the middle, PSM mode
+"<s>▁<AIX-SPAN-PRE># the file path is: test.py\n# the code file is written by Python\nfor i in range(20):\n    if ▁<AIX-SPAN-POST>        print(\"Hello World\")\n▁<AIX-SPAN-MIDDLE>i % 5 == 0:<\s>"
+```
 
 ## Details of Experimental Results
 

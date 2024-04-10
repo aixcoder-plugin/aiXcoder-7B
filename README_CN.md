@@ -16,8 +16,8 @@
 3. [aiXcoder 7B 训练数据](#aixcoder-7b-训练数据)
 4. [训练](#训练)
     - [训练超参数](#训练超参数)
-    <!-- - [批量数据组织方式](#批量数据组织方式)
-    - [预训练任务](#预训练任务) -->
+    - [批量数据组织方式](#批量数据组织方式)
+    - [预训练任务](#预训练任务)
 5. [实验结果](#实验结果)
     - [NL2Code 基准测试](#nl2code-基准测试)
     - [代码补全 (Fill in the Middle)](#代码补全-fill-in-the-middle)
@@ -312,6 +312,39 @@ class MyClass(object):
 - AdamW 优化器，学习率最大1e-5，最小 1e-6，采用余弦衰减
 - 预训练长度为 32,768
 
+
+### 批量数据组织方式
+
+我们的代码数据在完成预处理之后会以项目为单位组织起来，项目内的文件排序既考虑了规则也考虑了随机性。具体而言，我们会尝试使用CallingGraph、K-Means聚类、文件路径相似性、TF-IDE距离等将相似或相依赖的代码文件聚在一起，让模型更理解代码文件之间的相关性。但与此同时，代码文件的排序也需要考虑随机性，因为在实际编程场景中，项目并不是完整的，相似性代码或者依赖性代码也许还没有完善。
+
+在保证项目代码文件整体具有随机性，局部具有相似关系或依赖关系之后，我们将项目代码文件拉长为一个向量，使用Transformer-XL的方式组织Batch之间的顺序。尽管预训练过程中单个Batch的序列长度已经达到了32768，但通过这种方式仍然能将可见序列长度扩展到更长。
+
+### 预训练任务
+
+与其它自然语言大模型或代码大模型不同，在代码编程场景下， aiXcoder 考虑了代码本身的结构性特点，尽量让模型预测出完整的代码节点。简单而言，aiXcoder 训练任务结合了 fill in the middle(FIM, Bavarian et al., 2022) and parser generator tool，在构造训练数据时我们会将代码解析为抽象语法树，并随机截取一个完整的节点构造 FIM。这样做的原因首先我们需要保证输入数据相对完整，前序与后续都处于同一层级。其次，我们也需要模型预测结果更加完整，生成的代码具有完整层次结构。
+
+```python
+for i in range(20):
+    if i % 5 == 0:
+        print("Hello World")
+```
+
+![table_0](./assets/graphviz.svg)
+> 如上简单的代码能解析为抽象语法树，我们会根据抽象语法树的节点构造结构化的 FIM 训练任务。
+
+<br>
+<br>
+
+假设我们选中了上述代码中的 IF 结点，那么我们将从 IF 结点及其子树构造出训练样本。如下两条例子是等价的：
+
+```bash
+
+# fill in the middle, SPM mode
+"<s>▁<AIX-SPAN-PRE>▁<AIX-SPAN-POST>        print(\"Hello World\")\n▁<AIX-SPAN-MIDDLE># the file path is: test.py\n# the code file is written by Python\nfor i in range(20):\n    if i % 5 == 0:<\s>"
+
+# fill in the middle, PSM mode
+"<s>▁<AIX-SPAN-PRE># the file path is: test.py\n# the code file is written by Python\nfor i in range(20):\n    if ▁<AIX-SPAN-POST>        print(\"Hello World\")\n▁<AIX-SPAN-MIDDLE>i % 5 == 0:<\s>"
+```
 
 ## 实验结果
 
