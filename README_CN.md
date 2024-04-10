@@ -128,7 +128,7 @@ MAX_JOBS=8 python setup.py install
 如果需要快速执行，只需要通过以下命令行即可运行推理样本:
 
 ```bash
-torchrun --nproc_per_node 1 sess_megatron.py --model-dir "path/to/model_weights_dir"
+torchrun --nproc_per_node 1 sess_megatron.py --model_dir "path/to/model_weights_dir"
 ```
 
 将 "path/to/model_weights_dir" 替换为您下载模型权重后的本地地址。
