@@ -398,7 +398,11 @@ For each evaluation result in Table 3, there are more detailed evaluation dimens
 
 Another important capability of large language models for code is the ability to understand code context across files, as developers often need to consider information from other files within the current project when writing code. Therefore, we adopted the CrossCodeEval (Ding et al., 2023) evaluation dataset to assess the model's ability to extract cross-file contextual information.
 
-In Table 8, we first evaluate the generation capability of each large language model for code in a single-file setting as a baseline. Then, using BM25 as the similarity metric, we search for similar code within the project based on the context and use it as a prompt to re-evaluate the model's generation performance. Finally, "w/Ref." represents the scenario where we assume we know what the correct reference code looks like, and we search for similar code within the project using the references as a prompt to re-evaluate the model's generation performance. Ultimately, the aiXcoder-7B model achieves the best performance in all languages, indicating that our model has the strongest ability to extract contextual information, especially cross-file contextual information.
+In Table 8, we fix the context length for all models at 16K and format the input using the PSM pattern in FIM. After the model completes inference, all output results are decoded using Greedy Search. First, as a baseline, we evaluate the generation capabilities of various large code models in a single-file scenario.
+
+Then, using BM25 as the similarity metric, we search for the three most similar code blocks within the project as prompts to reassess the model's generation performance. Finally, "w/Ref." indicates that we assume we know what the correct Reference code looks like, and then search for the three most similar codes within the project as prompts to re-evaluate the model's generation performance.
+
+Ultimately, the aiXcoder-7B model performs very well in all languages, demonstrating our model's ability to extract contextual information, especially cross-file contextual information.
 
 ![table_8](./assets/table_8.png)
 

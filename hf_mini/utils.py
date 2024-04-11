@@ -1117,4 +1117,4 @@ def input_wrapper(code_string, later_code: str = "", path: str = "") -> str:
         des = LANGUAGE_WRAPPER.get(lang, "")
         if len(des) > 0 and "<AIX-SPE>" in des:
             p = des.replace("<AIX-SPE>", f"the file path is: {path}") + "\n"
-    return f"▁<AIX-SPAN-PRE>▁<AIX-SPAN-POST>{later_code}▁<AIX-SPAN-MIDDLE>{p}{code_string}"
+    return f"<s>▁<AIX-SPAN-PRE>▁<AIX-SPAN-POST>{later_code}▁<AIX-SPAN-MIDDLE>{p}{code_string}"
