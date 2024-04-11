@@ -252,7 +252,7 @@ def quick_sort(arr):
 
 ### Quantized through bitsandbytes
 
-We can also install Bitsandbytes through `pip install bitsandbytes Acceleration`, and simply add configuration to perform int8 or int4 inference (if you need to further compress the temporary memory applied at runtime, it is recommended to install FlashAttention):
+We can also install Bitsandbytes through `pip install bitsandbytes acceleration`, and simply add configuration to perform int8 or int4 inference (if you need to further compress the temporary memory applied at runtime, it is recommended to install FlashAttention):
 
 ```python
 
