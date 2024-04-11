@@ -13,6 +13,7 @@ Table of Contents
     - [Environment Requirements](#environment-requirements)
     - [Model Weights](#model-weights)
     - [Inference Example](#inference-example)
+    - [Quantized through bitsandbytes](#quantized-through-bitsandbytes)
 3. [Data for aiXcoder 7B](#data-for-aixcoder-7b)
 4. [Training](#training)
     - [Training Hyperparameters](#training-hyperparameters)
@@ -245,6 +246,54 @@ def quick_sort(arr):
     # 对右半部分进行递归排序
     quick_sort(arr[left + 1:])
     return arr</s>
+"""
+
+```
+
+### Quantized through bitsandbytes
+
+We can also install Bitsandbytes through `pip install bitsandbytes Acceleration`, and simply add configuration to perform int8 or int4 inference (if you need to further compress the temporary memory applied at runtime, it is recommended to install FlashAttention):
+
+```python
+
+import sys
+import torch
+from hf_mini.utils import input_wrapper
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig    
+
+# to use 4bit use `load_in_4bit=True` instead
+bnb_config = BitsAndBytesConfig(load_in_8bit=True) 
+
+device = "cuda" # the device to load the model onto
+
+tokenizer = AutoTokenizer.from_pretrained("aiXcoder/aixcoder-7b-base")
+model = AutoModelForCausalLM.from_pretrained("aiXcoder/aixcoder-7b-base", quantization_config=bnb_config, device_map=device, attn_implementation='flash_attention_2')
+
+text = input_wrapper(
+    code_string="# 快速排序算法",
+    later_code="\n",
+    path="test.py"
+)
+
+if len(text) == 0:
+    sys.exit()
+
+inputs = tokenizer(text, return_tensors="pt", return_token_type_ids=False)
+
+inputs = inputs.to(device)    
+
+outputs = model.generate(**inputs, max_new_tokens=256)
+print(f"Model memory footprint: {model.get_memory_footprint() / 2**20:.2f} MB")
+print(f"Torch max memory allocated: {torch.cuda.max_memory_allocated() / 2**20:.2f} MB")
+
+"""
+load_in_4bit=True:
+    - Model memory footprint: 5656.52 MB
+    - Torch max memory allocated: 6448.89 MB
+
+load_in_8bit=True:
+    - Model memory footprint: 9008.52 MB
+    - Torch max memory allocated: 10061.51 MB
 """
 
 ```

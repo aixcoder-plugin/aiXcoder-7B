@@ -1090,17 +1090,19 @@ LANGUAGE_TAG = {
 
 
 import re
+import time
 from hf_mini.filter import SensitiveInforRM
 is_security = SensitiveInforRM()
 
 def input_wrapper(code_string, later_code: str = "", path: str = "") -> str:
 
+    start = time.time()
     _sequerity = True
     for i in [code_string, later_code, path]:
         if not is_security.is_security(i):
             _sequerity = False
             break
-    
+    print(f"Done inputs checking with {(time.time()-start) * 1000:.2f}ms", flush=True)
     if not _sequerity:
         return ""
 
