@@ -14,6 +14,7 @@
     - [模型权重](#模型权重)
     - [推理示例](#推理示例)
     - [Bitsandbytes 量化执行](#bitsandbytes-量化执行)
+    - [微调示例](#微调示例)
 3. [aiXcoder 7B 训练数据](#aixcoder-7b-训练数据)
 4. [训练](#训练)
     - [训练超参数](#训练超参数)
@@ -290,6 +291,31 @@ load_in_8bit=True:
 """
 
 ```
+
+### 微调示例
+
+如果希望针对自有代码进行微调，可以借助 Huggingface 的 PEFT 工具快速上手训练。在此之前你需要先安装依赖库 `pip install -r requirements_peft.txt`。
+
+然后执行训练命令：
+
+```bash
+accelerate launch finetune.py \
+        --model_id "aiXcoder/aixcoder-7b-base" \
+        --dataset_name "bigcode/the-stack-smol" \
+        --subset "data/rust" \
+        --dataset_text_field "content" \
+        --split "train" \
+        --max_seq_length 1024 \
+        --max_steps 10000 \
+        --micro_batch_size 1 \
+        --gradient_accumulation_steps 8 \
+        --learning_rate 5e-6 \
+        --warmup_steps 20 \
+        --fim_rate 0.5 \
+        --num_proc "$(nproc)"
+```
+
+在微调脚本中，我们构造了简单的随机 FIM 训练任务，可以训练模型在自有数据上的补全与生成能力。需要注意的是，aiXcoder-7b-base 在预训练中采用的是[结构化 FIM](#预训练任务)，即将一个完整代码块构造成 MIDDLE，不过构造这样的训练数据涉及到语法解析，可能需要开发者自行实现。
 
 ## aiXcoder 7B 训练数据
 

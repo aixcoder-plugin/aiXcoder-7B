@@ -14,6 +14,7 @@ Table of Contents
     - [Model Weights](#model-weights)
     - [Inference Example](#inference-example)
     - [Quantized through bitsandbytes](#quantized-through-bitsandbytes)
+    - [Fine-tuning example](#fine-tuning-example)
 3. [Data for aiXcoder 7B](#data-for-aixcoder-7b)
 4. [Training](#training)
     - [Training Hyperparameters](#training-hyperparameters)
@@ -298,6 +299,30 @@ load_in_8bit=True:
 
 ```
 
+### Fine-tuning example
+
+If you want to fine-tune on your own code, you can quickly get started with training using Huggingface's PEFT tools. Before doing so, you need to install the necessary libraries with `pip install -r requirements_peft.txt`.
+
+Then, execute the training command:
+
+```bash
+accelerate launch finetune.py \
+        --model_id "aiXcoder/aixcoder-7b-base" \
+        --dataset_name "bigcode/the-stack-smol" \
+        --subset "data/rust" \
+        --dataset_text_field "content" \
+        --split "train" \
+        --max_seq_length 1024 \
+        --max_steps 10000 \
+        --micro_batch_size 1 \
+        --gradient_accumulation_steps 8 \
+        --learning_rate 5e-6 \
+        --warmup_steps 20 \
+        --fim_rate 0.5 \
+        --num_proc "$(nproc)"
+```
+
+In the fine-tuning script, we have constructed a simple random FIM (Fill-In-the-Middle) training task that can train the model on the completion and generation capabilities on your own data. It should be noted that the aiXcoder-7b-base uses [structured FIM](#pre-training-tasks) during pre-training, which involves constructing a complete code block as the MIDDLE. However, creating such training data involves syntactic parsing, which may require developers to implement themselves.
 
 ## Data for aiXcoder 7B
 

@@ -1259,7 +1259,7 @@ class Tokenizer:
             t = [self.bos_id] + t
         else:
             t = [self.bos_id, self.prefix_tok_id, self.suffix_tok_id] + self.__encode(later_code, None, True)
-            t = [self.middle_tok_id] + self.__encode(code_string, file_path, False)
+            t += [self.middle_tok_id] + self.__encode(code_string, file_path, False)
         
         return t
 
