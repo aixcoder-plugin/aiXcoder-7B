@@ -133,19 +133,3 @@ def _set_random_seed(seed_, data_parallel_random_init=False):
             tensor_parallel.model_parallel_cuda_manual_seed(seed)
     else:
         raise ValueError('Seed ({}) should be a positive integer.'.format(seed_))
-
-def _set_random_seed(seed_, data_parallel_random_init=False):
-    """Set random seed for reproducibility."""
-    if seed_ is not None and seed_ > 0:
-        # Ensure that different pipeline MP stages get different seeds.
-        seed = seed_ + (100 * mpu.get_pipeline_model_parallel_rank())
-        # Ensure different data parallel ranks get different seeds
-        if data_parallel_random_init:
-            seed = seed + (10 * mpu.get_data_parallel_rank())
-        random.seed(seed)
-        np.random.seed(seed)
-        torch.manual_seed(seed)
-        if torch.cuda.device_count() > 0:
-            tensor_parallel.model_parallel_cuda_manual_seed(seed)
-    else:
-        raise ValueError('Seed ({}) should be a positive integer.'.format(seed_))
