@@ -1091,11 +1091,16 @@ LANGUAGE_TAG = {
 
 import re
 import time
+import torch
+from typing import Union, Dict
+from transformers import AutoTokenizer
+
 from hf_mini.filter import SensitiveInforRM
+
+
 is_security = SensitiveInforRM()
 
-def input_wrapper(code_string, later_code: str = "", path: str = "") -> str:
-
+def input_wrapper(tokenizer: AutoTokenizer, code_string: str, later_code: str = "", path: str = "", pad_token: str = "☺" ) -> Union[Dict,None]:
     start = time.time()
     _sequerity = True
     for i in [code_string, later_code, path]:
@@ -1104,7 +1109,7 @@ def input_wrapper(code_string, later_code: str = "", path: str = "") -> str:
             break
     print(f"Done inputs checking with {(time.time()-start) * 1000:.2f}ms", flush=True)
     if not _sequerity:
-        return ""
+        return None
 
     extension_pattern = re.compile(r"(\.\w+)$")
     p = ""
@@ -1119,4 +1124,18 @@ def input_wrapper(code_string, later_code: str = "", path: str = "") -> str:
         des = LANGUAGE_WRAPPER.get(lang, "")
         if len(des) > 0 and "<AIX-SPE>" in des:
             p = des.replace("<AIX-SPE>", f"the file path is: {path}") + "\n"
-    return f"<s>▁<AIX-SPAN-PRE>▁<AIX-SPAN-POST>{later_code}▁<AIX-SPAN-MIDDLE>{p}{code_string}"
+
+    # SPM
+    pad_ids =  tokenizer(pad_token, return_tensors="pt", return_token_type_ids=False)
+    pad_len = len(pad_ids["input_ids"][0])
+    pre_code_ids = tokenizer("<s>▁<AIX-SPAN-PRE>▁<AIX-SPAN-POST>", return_tensors="pt", return_token_type_ids=False)
+
+    later_code_ids = tokenizer(pad_token + later_code, return_tensors="pt", return_token_type_ids=False)
+    later_code_ids["input_ids"] = later_code_ids["input_ids"][:,pad_len:]
+    later_code_ids["attention_mask"] = later_code_ids["attention_mask"][:,pad_len:]
+
+    code_string_ids = tokenizer(f"▁<AIX-SPAN-MIDDLE>{p}{code_string}", return_tensors="pt", return_token_type_ids=False)
+    code_string_ids["input_ids"] = torch.cat([pre_code_ids["input_ids"], later_code_ids["input_ids"], code_string_ids["input_ids"]], dim = 1)
+    code_string_ids["attention_mask"] = torch.cat([pre_code_ids["attention_mask"], later_code_ids["attention_mask"], code_string_ids["attention_mask"]], dim = 1)
+
+    return code_string_ids
